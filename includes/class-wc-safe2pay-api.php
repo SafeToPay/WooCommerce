@@ -371,29 +371,31 @@ class WC_Safe2Pay_API
             );
         } else {
             try {
-
                 $response = json_decode($response["body"]);
 
-                if ($response->HasError == true) {
-//                    return array(
-//                        'url' => '',
-//                        'data' => '',
-//                        'error' => array('<strong>' . __('Safe2Pay', 'woo-safe2pay') . '</strong>: ' . __($response->Error, 'woo-safe2pay'))
-//                    );
+	            if ( $response->HasError == true ) {
+		            if ( $this->gateway->debug == 'yes' ) {
+			            $this->gateway->log->add( $this->gateway->id, print_r($response, true ) );
+		            }
 
-                    wc_add_notice(__('Erro ', 'woo-safe2pay') . $response->ErrorCode . ' - ' . $response->Error, 'error');
+		            wc_add_notice( __( 'Erro: ', 'woo-safe2pay' ) . $response->ErrorCode . ' - ' . $response->Error, 'error' );
+	            } else if (  $response->ResponseDetail->Status == 6 || $response->ResponseDetail->Status == 8  ) {
+		            if ( $this->gateway->debug == 'yes' ) {
+			            $this->gateway->log->add( $this->gateway->id, 'Erro no pedido ' . $order->get_order_number() . ' com a seguinte responsta: ' . print_r($response, true ) );
+		            }
 
-                } else {
-                    if ('yes' == $this->gateway->debug) {
-                        $this->gateway->log->add($this->gateway->id, 'Transação gerado com sucesso!');
-                    }
+		            wc_add_notice( __( 'Erro: ', 'woo-safe2pay' ) . $response->ResponseDetail->Message, 'error' );
+	            } else {
+		            if ( $this->gateway->debug == 'yes' ) {
+			            $this->gateway->log->add( $this->gateway->id, 'Transação ' . $response->ResponseDetail->IdTransaction . ' gerada para o pedido ' . $order->get_order_number() . ' com o seguinte conteúdo: ' . print_r($response, true ) );
+		            }
 
-                    return array(
-                        'url' => $this->gateway->get_return_url($order),
-                        'data' => $response->ResponseDetail,
-                        'error' => '',
-                    );
-                }
+		            return array(
+			            'url'   => $this->gateway->get_return_url( $order ),
+			            'data'  => $response->ResponseDetail,
+			            'error' => '',
+		            );
+	            }
             } catch (Exception $e) {
                 $data = '';
 
