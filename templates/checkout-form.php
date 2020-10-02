@@ -225,15 +225,25 @@ $min_installment = isset($tc_minimum_installment_amount) ? $tc_minimum_installme
 
     <div class="clear"></div>
 
-    <?php if (!is_plugin_active('woocommerce-extra-checkout-fields-for-brazil/woocommerce-extra-checkout-fields-for-brazil.php'))  : ?>
-        <?php if (!is_plugin_active('woocommerce-extra-checkout-fields-for-brazil/woocommerce-extra-checkout-fields-for-brazil.php'))  : ?>
+    <?php if (!is_plugin_active('woocommerce-extra-checkout-fields-for-brazil/woocommerce-extra-checkout-fields-for-brazil.php'))  : ?>    
+        <?php if (is_plugin_active('sitepress-multilingual-cms/sitepress.php'))  : ?>
+            <?php if(ICL_LANGUAGE_CODE == 'pt-br'): ?>
+    
+    <p id="safe2pay-identity-field" class="form-row form-row-first" style="margin-bottom: 4%;">
+        <label for="safe2pay-card-cvc"><?php _e('CPF/CNPJ do titular', 'woo-safe2pay'); ?> <span class="required">*</span></label>
+        <input onkeypress="MaskcpfCnpj(this)" id="safe2pay-customer-identity" name="customer_identity" type="tel"
+               autocomplete="off" maxlength="18" style="font-size: 1.5em; padding: 8px;width: 100%; heigth: 100%;"/>
+    </p>
+    
+            <?php else: ?>
 
-            <p id="safe2pay-identity-field" class="form-row form-row-first" style="margin-bottom: 4%;">
-                <label for="safe2pay-card-cvc">CPF/CNPJ do titular <span class="required">*</span></label>
-                <input onkeypress="MaskcpfCnpj(this)" id="safe2pay-customer-identity" name="customer_identity" type="tel"
-                       autocomplete="off" maxlength="18" style="font-size: 1.5em; padding: 8px;width: 100%; heigth: 100%;"/>
-            </p>
-
+    <p id="safe2pay-identity-field" class="form-row form-row-first" style="margin-bottom: 4%;">
+        <label for="safe2pay-card-cvc"><?php _e('Personal ID Number', 'woo-safe2pay'); ?> <span class="required">*</span></label>
+        <input id="safe2pay-customer-identity" name="customer_identity" type="tel"
+               autocomplete="off" maxlength="18" style="font-size: 1.5em; padding: 8px;width: 100%; heigth: 100%;"/>
+    </p>    
+    
+            <?php endif; ?>    
         <?php endif; ?>
     <?php endif; ?>
 
