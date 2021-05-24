@@ -11,10 +11,19 @@ $min_installment = isset($tc_minimum_installment_amount) ? $tc_minimum_installme
 <fieldset id="safe2pay-payment-form">
 
     <ul id="safe2pay-payment-methods" style="margin-bottom: 5%;">
+	    <?php if ($tc_pix == 'yes') : ?>
+            <li><label>
+                    <input id="safe2pay-payment-method-pix" type="radio" name="safe2pay_payment_method"
+                           value="pix" <?php checked(true, ( 'no' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_debit && 'no' == $tc_ticket), true); ?> />
+				    <?php _e('Pix', 'woo-safe2pay'); ?>
+
+                </label></li>
+	    <?php endif; ?>
+
         <?php if ($tc_ticket == 'yes') : ?>
             <li><label>
                     <input id="safe2pay-payment-method-bank-slip" type="radio" name="safe2pay_payment_method"
-                           value="bank-slip" <?php checked(true, ('no' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_debit && 'yes' == $tc_ticket), true); ?> />
+                           value="bank-slip" <?php checked(true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_debit ), true); ?> />
                     <?php _e('Boleto', 'woo-safe2pay'); ?>
 
                 </label></li>
@@ -23,7 +32,8 @@ $min_installment = isset($tc_minimum_installment_amount) ? $tc_minimum_installme
         <?php if ($tc_credit == 'yes') : ?>
             <li><label>
                     <input id="safe2pay-payment-method-credit-card" type="radio" name="safe2pay_payment_method"
-                           value="credit-card" <?php checked(true, ('yes' == $tc_credit), true); ?> />
+                    value="credit-card" <?php checked(true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'no' == $tc_debit && 'yes' == $tc_ticket), true); ?> />
+
                     <?php _e('Cartão de Crédito', 'woo-safe2pay'); ?>
                 </label></li>
         <?php endif; ?>
@@ -31,7 +41,7 @@ $min_installment = isset($tc_minimum_installment_amount) ? $tc_minimum_installme
         <?php if ($tc_debit == 'yes') : ?>
             <li><label>
                     <input id="safe2pay-payment-method-debit-card" type="radio" name="safe2pay_payment_method"
-                           value="debit-card" <?php checked(true, ('no' == $tc_cryptocurrency && 'no' == $tc_credit && 'yes' == $tc_debit && 'no' == $tc_ticket), true); ?> />
+                           value="debit-card" <?php checked(true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_ticket), true); ?> />
                     <?php _e('Cartão de Débito', 'woo-safe2pay'); ?>
                 </label></li>
         <?php endif; ?>
@@ -39,13 +49,25 @@ $min_installment = isset($tc_minimum_installment_amount) ? $tc_minimum_installme
         <?php if ($tc_cryptocurrency == 'yes') : ?>
             <li><label>
                     <input id="safe2pay-payment-method-crypto-currency" type="radio" name="safe2pay_payment_method"
-                           value="crypto-currency" <?php checked(true, ('yes' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_debit && 'no' == $tc_ticket), true); ?> />
+                           value="crypto-currency" <?php checked(true, ( 'no' == $tc_pix && 'no' == $tc_credit && 'no' == $tc_debit && 'no' == $tc_ticket), true); ?> />
                     <?php _e('Criptomoedas', 'woo-safe2pay'); ?>
                 </label></li>
         <?php endif; ?>
     </ul>
 
     <div class="clear"></div>
+
+	<?php if ('yes' == $tc_pix) : ?>
+        <div id="safe2pay-pix-form" class="safe2pay-method-form">
+            <p>
+                <i id="safe2pay-icon-pix"></i>
+				<?php _e('Realize o pagamento através de Pix.', 'woo-safe2pay'); ?>
+            </p>
+
+            <div class="clear"></div>
+
+        </div>
+	<?php endif; ?>
 
     <?php if ('yes' == $tc_ticket) : ?>
         <div id="safe2pay-bank-slip-form" class="safe2pay-method-form">
