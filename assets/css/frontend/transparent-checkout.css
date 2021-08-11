@@ -157,6 +157,16 @@
 	margin-left: 2px;
 }
 
+#safe2pay-icon-pix {
+	background: transparent url(../../images/pix.png) no-repeat;
+	display: block;
+	float: left;
+	height: 85px;
+	margin: 0 10px 5px 0;
+	width: 68px;
+	margin-left: 2px;
+}
+
 #safe2pay-icon-credit-card {
     background: transparent url(../../images/iconcredit.png) no-repeat;
     display: block;

@@ -4,7 +4,7 @@
  * Plugin URI:           https://safe2pay.com.br/
  * Description:          Aceite pagamentos por boleto, criptomoedas e cartões de crédito e débito pelo Safe2Pay.
  * Author:               Safe2Pay
- * Version:              1.7
+ * Version:              1.8
  * License:              GPLv3 or later
  * Text Domain:          woo-safe2pay
  * Domain Path:          /languages

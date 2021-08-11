@@ -28,7 +28,8 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
         $this->tc_installments = $this->get_option('tc_installments');
         $this->tc_minimum_installment_amount = $this->get_option('tc_minimum_installment_amount');
         $this->tc_debit = $this->get_option('tc_debit', 'no');
-        $this->tc_ticket = $this->get_option('tc_ticket', 'no');
+	    $this->tc_pix = $this->get_option('tc_pix', 'no');
+	    $this->tc_ticket = $this->get_option('tc_ticket', 'no');
         $this->tc_cryptocurrency = $this->get_option('tc_cryptocurrency', 'no');
         $this->invoice_prefix = $this->get_option('invoice_prefix', 'WC-');
         $this->sandbox = $this->get_option('sandbox', 'no');
@@ -249,6 +250,12 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                 'type' => 'title',
                 'description' => '',
             ),
+            'tc_pix' => array(
+	            'title' => __('Pix', 'woo-safe2pay'),
+	            'type' => 'checkbox',
+	            'label' => __('Pix', 'woo-safe2pay'),
+	            'default' => 'yes',
+            ),
             'tc_ticket' => array(
                 'title' => __('Boleto Bancário', 'woo-safe2pay'),
                 'type' => 'checkbox',
@@ -356,7 +363,6 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                     'min' => 5.00
                 )
             ),
-
             'tc_debit' => array(
                 'title' => __('Cartão de Débito', 'woo-safe2pay'),
                 'type' => 'checkbox',
@@ -471,6 +477,7 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                 'tc_credit' => $this->tc_credit,
                 'tc_installments' => $this->tc_installments,
                 'tc_minimum_installment_amount' => $this->tc_minimum_installment_amount,
+                'tc_pix' => $this->tc_pix,
                 'tc_ticket' => $this->tc_ticket,
                 '$discount_percentage' => $discount_percentage,
                 'discount_bank_slip' => $this->discount_bank_slip,
@@ -656,14 +663,27 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                     $meta_data[__('Amount', 'woo-safe2pay')] = $payment_data['amount'];
                 }
                 break;
-            case "debit-card":
-                $payment_data['paymenttype'] = '4';
+	        case "debit-card":
+		        $payment_data['paymenttype'] = '4';
 
-                if ($posted->AuthenticationUrl != null) {
-                    $payment_data['link'] = sanitize_text_field((string)$posted->AuthenticationUrl);
-                    $meta_data[__('URL de Autenticação', 'woo-safe2pay')] = $payment_data['link'];
-                }
-                break;
+		        if ($posted->AuthenticationUrl != null) {
+			        $payment_data['link'] = sanitize_text_field((string)$posted->AuthenticationUrl);
+			        $meta_data[__('URL de Autenticação', 'woo-safe2pay')] = $payment_data['link'];
+		        }
+		        break;
+	        case "pix":
+		        $payment_data['paymenttype'] = '6';
+
+		        if ($posted->Key != null) {
+			        $payment_data['key'] = sanitize_text_field((string)$posted->Key);
+			        $meta_data[__('Copia e Cola', 'woo-safe2pay')] = $payment_data['key'];
+		        }
+
+		        if ($posted->QrCode != null) {
+			        $payment_data['link'] = sanitize_text_field((string)$posted->QrCode);
+			        $meta_data[__('Qr-Code', 'woo-safe2pay')] = $payment_data['link'];
+		        }
+		        break;
         }
 
         $meta_data['_wc_safe2pay_payment_data'] = $payment_data;
@@ -702,27 +722,19 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                 switch ($posted->Status) {
                     case '1':
                         $order->update_status('on-hold', __('Safe2Pay: Pendente.', 'woo-safe2pay'));
-
                         break;
                     case '2':
                         $order->update_status('on-hold', __('Safe2Pay: Processamento.', 'woo-safe2pay'));
-
-                        if (function_exists('wc_reduce_stock_levels')) {
-                            wc_reduce_stock_levels($order_id);
-                        }
-
                         $order->add_order_note(__('Safe2Pay: Pagamento em processamento..', 'woo-safe2pay'));
-
                         break;
                     case '3':
                         if (method_exists($order, 'get_status') && 'cancelled' === $order->get_status()) {
-                            $order->update_status('processing', __('Safe2Pay: Payment approved.', 'woo-safe2pay'));
+                            $order->update_status('processing', __('Safe2Pay: Pagamento autorizado.', 'woo-safe2pay'));
                             wc_reduce_stock_levels($order_id);
                         } else {
                             $order->add_order_note(__('Safe2Pay: Autorizado.', 'woo-safe2pay'));
                             $order->payment_complete(sanitize_text_field((string)$posted->IdTransaction));
                         }
-
                         break;
                     case '5':
                         $order->update_status('processing', __('Safe2Pay: Em disputa.', 'woo-safe2pay'));
@@ -755,17 +767,7 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                         $order->add_order_note(__('Safe2Pay: Recusado.', 'woo-safe2pay'));
 
                         break;
-                    case '11':
-                        if (method_exists($order, 'get_status') && 'cancelled' === $order->get_status()) {
-                            $order->update_status('processing', __('Safe2Pay: Payment released.', 'woo-safe2pay'));
-                            wc_reduce_stock_levels($order_id);
-                        } else {
-                            $order->add_order_note(__('Safe2Pay: Boleto liberado.', 'woo-safe2pay'));
-
-                            $order->payment_complete(sanitize_text_field((string)$posted->IdTransaction));
-                        }
-
-                        break;
+	                case '7':
                     case '12':
                         $order->update_status('cancelled', __('Safe2Pay: Em cancelamento.', 'woo-safe2pay'));
 
@@ -802,7 +804,6 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                             'paymenttype' => $data['paymenttype'],
                             'link' => $data['link']
                         ], 'woocommerce/safe2pay/', WC_Safe2Pay::get_templates_path());
-
                     break;
                 case '2':
                     wc_get_template('cc-payment-instructions.php',
@@ -810,7 +811,6 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                             'paymenttype' => $data['paymenttype'],
                             'description' => $data['description'],
                         ], 'woocommerce/safe2pay/', WC_Safe2Pay::get_templates_path());
-
                     break;
                 case '3':
                     wc_get_template('crypto-payment-instructions.php',
@@ -821,7 +821,6 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                             'amount' => $data['amount'],
                             'symbol' => $data['symbol']
                         ], 'woocommerce/safe2pay/', WC_Safe2Pay::get_templates_path());
-
                     break;
                 case '4':
                     wc_get_template('dc-payment-instructions.php',
@@ -829,8 +828,15 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
                             'paymenttype' => $data['paymenttype'],
                             'link' => $data['link']
                         ], 'woocommerce/safe2pay/', WC_Safe2Pay::get_templates_path());
-
                     break;
+	            case '6':
+		            wc_get_template('pix-payment-instructions.php',
+			            [
+				            'paymenttype' => $data['paymenttype'],
+				            'link' => $data['link'],
+				            'key' => $data['key']
+			            ], 'woocommerce/safe2pay/', WC_Safe2Pay::get_templates_path());
+		            break;
             }
         }
     }

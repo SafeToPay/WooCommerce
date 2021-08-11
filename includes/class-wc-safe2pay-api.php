@@ -17,7 +17,7 @@ class WC_Safe2Pay_API
     {
         $params = array(
             'method' => $method,
-            'timeout' => 60,
+            'timeout' => 30,
         );
 
         if ('POST' == $method && !empty($data)) {
@@ -47,7 +47,8 @@ class WC_Safe2Pay_API
             'bank-slip' => 'bankslip',
             'credit-card' => 'creditcard',
             'crypto-currency' => 'cryptocurrency',
-            'debit-card' => 'debitcard'
+            'debit-card' => 'debitcard',
+            'pix' => 'pix',
         ];
 
         return isset($methods[$method]) ? $methods[$method] : '';
@@ -78,9 +79,13 @@ class WC_Safe2Pay_API
                     $methods[] = 'crypto-currency';
                 }
 
-                if ($value->PaymentMethod->Code === '4') {
-                    $methods[] = 'debit-card';
-                }
+	            if ($value->PaymentMethod->Code === '4') {
+		            $methods[] = 'debit-card';
+	            }
+
+	            if ($value->PaymentMethod->Code === '6') {
+		            $methods[] = 'pix';
+	            }
             }
         }
 
@@ -216,18 +221,21 @@ class WC_Safe2Pay_API
                 );
 
                 break;
-            case 'debitcard':
-                $paymentMethod = "4";
+	        case 'debitcard':
+		        $paymentMethod = "4";
 
-                $PaymentObject = [
-                    'Authenticate' => true,
-                    'Holder' => sanitize_text_field($posted['safe2pay-debit-card-holder-name']),
-                    'CardNumber' => sanitize_text_field($posted['safe2pay-debit-card-number']),
-                    'ExpirationDate' => sanitize_text_field($posted['safe2pay-debit-card-expiry']),
-                    'SecurityCode' => sanitize_text_field($posted['safe2pay-debit-card-cvc'])
-                ];
+		        $PaymentObject = [
+			        'Authenticate' => true,
+			        'Holder' => sanitize_text_field($posted['safe2pay-debit-card-holder-name']),
+			        'CardNumber' => sanitize_text_field($posted['safe2pay-debit-card-number']),
+			        'ExpirationDate' => sanitize_text_field($posted['safe2pay-debit-card-expiry']),
+			        'SecurityCode' => sanitize_text_field($posted['safe2pay-debit-card-cvc'])
+		        ];
 
-                break;
+		        break;
+	        case 'pix':
+		        $paymentMethod = "6";
+		        break;
             default:
                 return [
                     'url' => '',
@@ -320,17 +328,10 @@ class WC_Safe2Pay_API
                     'error' => array(__('Too bad! The email or token from the Safe2Pay are invalids my little friend!', 'woo-safe2pay')),
                 );
             } else {
-//                return array(
-//                    'url' => '',
-//                    'data' => '',
-//                    'error' => array('<strong>' . __('Safe2Pay', 'woo-safe2pay') . '</strong>: ' . __($response->Error, 'woo-safe2pay')),
-//                );
-
                 wc_add_notice(__('Erro ', 'woo-safe2pay') . $response->ErrorCode . ' - ' . $response->Error, 'error');
             }
         } catch (Exception $e) {
 
-            // Return error message.
             return array(
                 'url' => '',
                 'token' => '',
