@@ -159,10 +159,10 @@ class WC_Safe2Pay_API
 
                     $seller_cpf = get_user_meta($item_seller_id, 'billing_cpf', true);
                     $seller_cnpj = get_user_meta($item_seller_id, 'billing_cnpj', true);
-                    $identity = $seller_cnpj ? $seller_cnpj : $seller_cpf;
+                    $identity = $seller_cnpj ? $seller_cpf;
 
                     $split = [
-                        'Name' => $seller_data->first_name . ' ' . isset($seller_data->last_name),
+                        'Name' => $seller_data->first_name . ' ' . (isset($seller_data->last_name)) ? $seller_data->last_name : '',
                         'Identity' => preg_replace('([^0-9])', '', $identity),
                         'Amount' => $item_value,
                         'IsPayTax' => $is_pay_tax,
