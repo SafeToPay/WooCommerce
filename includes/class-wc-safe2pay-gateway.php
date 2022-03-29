@@ -467,7 +467,7 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway
 
         $cart_total = $this->get_order_total();
 
-        $discount_percentage = $this->discount_amount_bank_slip;
+        $discount_percentage = intval($this->discount_amount_bank_slip);
         $discount_amount = ($cart_total / 100) * $discount_percentage;
 
         wc_get_template(

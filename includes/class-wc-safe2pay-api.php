@@ -4,6 +4,124 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+function get_product_commission($product_id, $product_price)
+{
+    $percentage_ar = get_post_meta($product_id, '_per_product_admin_commission');
+    $percentage = $percentage_ar[0];
+    if($percentage == 0){
+        return false;
+    }
+    $commission_ar = get_post_meta($product_id, '_per_product_admin_commission_type');
+    $commission = $commission_ar[0];
+    switch ($commission) {
+        case 'percentage':
+            $admin_commission = ($product_price / 100) * $percentage;
+            break;
+        case 'flat':
+            $flat = $percentage;
+            if($flat > $product_price){
+                $admin_commission = $flat;
+            }else{
+                $admin_commission = $flat;
+            }
+            break;
+        case 'combine':
+            $flat_ar = get_post_meta($product_id, '_per_product_admin_additional_fee');
+            $flat = $flat_ar[0];
+            $admin_commission = ($product_price / 100) * $percentage;
+            $resto = $product_price - $admin_commission;
+            if($flat > $resto){
+                $admin_commission = $product_price;
+            }else{
+                $admin_commission += $flat;
+            }
+            break;
+    }
+    return $admin_commission;
+}
+function get_user_commission($user_id, $product_price)
+{
+    $percentage_ar = get_user_meta($user_id, 'dokan_admin_percentage');
+    $percentage = $percentage_ar[0];
+    if($percentage == 0){
+        return false;
+    }
+    $commission_ar = get_user_meta($user_id, 'dokan_admin_percentage_type');
+    $commission = $commission_ar[0];
+    switch ($commission) {
+        case 'percentage':
+            $admin_commission = ($product_price / 100) * $percentage;
+            break;
+        case 'flat':
+            $flat = $percentage;
+            if($flat > $product_price){
+                $admin_commission = $flat;
+            }else{
+                $admin_commission = $flat;
+            }
+            break;
+        case 'combine':
+            $flat_ar = get_user_meta($user_id, 'dokan_admin_additional_fee');
+            $flat = $flat_ar[0];
+            $admin_commission = ($product_price / 100) * $percentage;
+            $resto = $product_price - $admin_commission;
+            if($flat > $resto){
+                $admin_commission = $product_price;
+            }else{
+                $admin_commission += $flat;
+            }
+            break;
+    }
+    return $admin_commission;
+}
+function get_global_commission($product_price)
+{   
+    $percentage = dokan_get_option('admin_percentage', 'dokan_selling');
+    if($percentage == 0){
+        return false;
+    }
+    $commission =  dokan_get_option('commission_type', 'dokan_selling');
+    switch ($commission) {
+        case 'percentage':
+            $admin_commission = ($product_price / 100) * $percentage;
+            break;
+        case 'flat':
+            $flat = $percentage;
+            if($flat > $product_price){
+                $admin_commission = $product_price;
+            }else{
+                $admin_commission = $flat;
+            }
+            break;
+        case 'combine':
+            $flat =  dokan_get_option('additional_fee', 'dokan_selling');
+            $admin_commission = ($product_price / 100) * $percentage;
+            $resto = $product_price - $admin_commission;
+            if($flat > $resto){
+                $admin_commission = $product_price;
+            }else{
+                $admin_commission += $flat;
+            }
+            break;
+    } 
+    return $admin_commission;
+}
+function get_admin_commission($product_id, $user_id, $product_price)
+{
+    $product_commission = get_product_commission($product_id, $product_price);
+    if($product_commission){
+        return $product_commission;
+    }
+    $user_commission = get_user_commission($user_id, $product_price);
+    if($user_commission){
+        return $user_commission;
+    }
+    $global_commission = get_global_commission($product_price);
+    if($global_commission){
+        return $global_commission;
+    }
+}
+
 class WC_Safe2Pay_API
 {
     protected $gateway;
@@ -127,7 +245,9 @@ class WC_Safe2Pay_API
                     $items_per_seller[$seller_id] = 0;
                 }
 
-                $items_per_seller[$seller_id] += $price_item;
+                $admin_commission = get_admin_commission($item_id, $seller_id, $price_item);
+                $seller_commission = $price_item - $admin_commission;
+                $items_per_seller[$seller_id] += $seller_commission;                
             }
 
             foreach ($items_per_seller as $seller_id => $total) {
@@ -136,11 +256,7 @@ class WC_Safe2Pay_API
                     $shipping_cost_amount = isset($sellers_shipping_cost[$seller_id]) ? $sellers_shipping_cost[$seller_id] : 0;
                     $total += $shipping_cost_amount;
                 }
-
-                $admin_commission_percentage = dokan_get_option('admin_percentage', 'dokan_selling', '10');
-                $admin_commission_total = ($total / 100) * $admin_commission_percentage;
-
-                $seller_commission_total = $total - $admin_commission_total;
+                $seller_commission_total = $total;
                 if (!isset($split_data[$seller_id])) $split_data[$seller_id] = 0;
                 $split_data[$seller_id] += $seller_commission_total;
             }
@@ -159,7 +275,7 @@ class WC_Safe2Pay_API
 
                     $seller_cpf = get_user_meta($item_seller_id, 'billing_cpf', true);
                     $seller_cnpj = get_user_meta($item_seller_id, 'billing_cnpj', true);
-                    $identity = $seller_cnpj ? $seller_cpf;
+                    $identity = $seller_cnpj ? $seller_cnpj : $seller_cpf;
 
                     $split = [
                         'Name' => $seller_data->first_name . ' ' . (isset($seller_data->last_name)) ? $seller_data->last_name : '',
