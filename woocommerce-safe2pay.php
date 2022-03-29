@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:          Safe2Pay (MOD)
+ * Plugin Name:          Safe2Pay
  * Plugin URI:           https://safe2pay.com.br/
  * Description:          Aceite pagamentos por boleto, criptomoedas, PIX, cartões de crédito e débito pelo Safe2Pay.
  * Author:               Safe2Pay
