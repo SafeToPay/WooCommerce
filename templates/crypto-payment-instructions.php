@@ -2,7 +2,7 @@
 	exit;
 } ?>
 
-<div class="woocommerce-message">
+<div class="woocommerce-message" style="display:block !important; color:#000 !important; background-color:#fff !important;">
 
     <span>
         <?php echo __( 'Seu pedido foi recebido. Veja abaixo os dados para realizar o pagamento:', 'woo-safe2pay' ); ?>

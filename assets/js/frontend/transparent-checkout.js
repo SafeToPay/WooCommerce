@@ -1,4 +1,3 @@
-/*global wc_safe2pay_params, S2PDirectPayment, wc_checkout_params */
 (function ($) {
     'use strict';
 
@@ -142,6 +141,13 @@
 
             if (0 < field.length) {
                 field.focusout();
+            }
+        });
+
+        $('#payment').on('submit', function(e) {
+            if (!$('#safe2pay-payment-methods input[type=radio]:checked').length) {
+                e.preventDefault();
+                alert('É necessário selecionar uma forma de pagamento.');
             }
         });
 

@@ -1,9 +1,4 @@
 <?php
-/**
- * Admin options screen.
- *
- * @package WooCommerce_Safe2Pay/Admin/Settings
- */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,3 +23,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 <table class="form-table">
 	<?php $this->generate_settings_html(); ?>
 </table>
+

@@ -4,7 +4,7 @@
 
 ## Aceite pagamentos com Safe2Pay
 
-O plugin do Safe2Pay para WooCommerce permite você aceitar pagamentos via boleto bancário, cartão de crédito, débito e
+O plugin do Safe2Pay para WooCommerce permite você aceitar pagamentos via boleto bancário, cartão de crédito e
 bitcoin diretamente na sua loja online, com rapidez, facilidade e com checkout 100% transparente.
 
 Transações de pagamento online devem ser rápidas e simples, sem asteriscos ou letras miúdas. É isso que o Safe2Pay
@@ -12,8 +12,7 @@ proporciona. Feito para todos os modelos de negócios, nossas soluções ajudam 
 
 ## Instalação e configuração
 
-1. Faça o download do plugin no nosso repositório do Github ou
-   na [loja do Wordpress](https://wordpress.org/plugins/safe2pay/)
+1. Faça o download do plugin no nosso repositório do Github.
 2. Após isso, faça login no painel do WordPress, navegue até o menu Plugins e clique em **Adicionar novo**.
 3. Em seguida faça o upload do arquivo e clique em **Instalar agora**.
 4. Após instalar e ativar o plug-in, clique em **configurações** no plugin.
@@ -37,7 +36,6 @@ compras.
 - **Boleto Bancário**
 - **Pix**
 - **Cartão de Crédito**
-- **Cartão de Débito**
 - **Criptomoedas**
 
 ## Requisitos

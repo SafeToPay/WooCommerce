@@ -1,9 +1,4 @@
 <?php
-/**
- * Missing WooCommerce Extra Checkout Fields for Brazil notice
- *
- * @package WooCommerce_Safe2Pay/Admin/Notices
- */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

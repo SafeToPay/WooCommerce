@@ -47,7 +47,6 @@ class WC_Safe2Pay_API
             'bank-slip' => 'bankslip',
             'credit-card' => 'creditcard',
             'crypto-currency' => 'cryptocurrency',
-            'debit-card' => 'debitcard',
             'pix' => 'pix',
         ];
 
@@ -78,10 +77,6 @@ class WC_Safe2Pay_API
                 if ($value->PaymentMethod->Code === '3') {
                     $methods[] = 'crypto-currency';
                 }
-
-	            if ($value->PaymentMethod->Code === '4') {
-		            $methods[] = 'debit-card';
-	            }
 
 	            if ($value->PaymentMethod->Code === '6') {
 		            $methods[] = 'pix';
@@ -182,8 +177,7 @@ class WC_Safe2Pay_API
     {
         $method = isset($posted['safe2pay_payment_method']) ? $this->GetPaymentMethod($posted['safe2pay_payment_method']) : '';
         $woo = new WooCommerce();
-        $paymentMethod = 0;
-        $PaymentObject = null;
+	    $PaymentObject = null;
 
         $Products = array(
             (object)array(
@@ -204,35 +198,31 @@ class WC_Safe2Pay_API
             case 'creditcard':
                 $paymentMethod = "2";
 
-                $PaymentObject = array(
+	            $PaymentObject = array(
                     'Holder' => sanitize_text_field($posted['safe2pay-card-holder-name']),
                     'CardNumber' => sanitize_text_field($posted['safe2pay-card-number']),
                     'ExpirationDate' => sanitize_text_field($posted['safe2pay-card-expiry-field']),
-                    'SecurityCode' => sanitize_text_field($posted['safe2pay-card-cvc']),
-                    'InstallmentQuantity' => !empty($posted['safe2pay_card_installments']) ? absint($posted['safe2pay_card_installments']) : 1
+                    'SecurityCode' => sanitize_text_field($posted['safe2pay-card-cvc'])
                 );
 
-                break;
+	            $installment = isset($posted['safe2pay_card_installments']) ? absint($posted['safe2pay_card_installments']) : 1;
+
+	            if (!empty($posted['safe2pay_card_installments'])) {
+		            $PaymentObject['InstallmentQuantity'] = $installment;
+	            }
+
+	            $interest_rates = isset($posted['tc_interest_rate']) ? explode(';', $posted['tc_interest_rate']) : array_fill(0, $installment, 0);
+	            $interest_rate = isset($interest_rates[$installment - 1]) ? floatval($interest_rates[$installment - 1]) : 0;
+
+	            if ($interest_rate > 0) {
+		            $PaymentObject['IsApplyInterest'] = true;
+		            $PaymentObject['InterestRate'] = floatval($interest_rate);
+	            }
+
+	            break;
             case 'cryptocurrency':
                 $paymentMethod = "3";
-
-                $PaymentObject = array(
-                    'Symbol' => sanitize_text_field($posted['safe2pay_currency-type']),
-                );
-
                 break;
-	        case 'debitcard':
-		        $paymentMethod = "4";
-
-		        $PaymentObject = [
-			        'Authenticate' => true,
-			        'Holder' => sanitize_text_field($posted['safe2pay-debit-card-holder-name']),
-			        'CardNumber' => sanitize_text_field($posted['safe2pay-debit-card-number']),
-			        'ExpirationDate' => sanitize_text_field($posted['safe2pay-debit-card-expiry']),
-			        'SecurityCode' => sanitize_text_field($posted['safe2pay-debit-card-cvc'])
-		        ];
-
-		        break;
 	        case 'pix':
 		        $paymentMethod = "6";
 		        break;

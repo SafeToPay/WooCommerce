@@ -1,9 +1,4 @@
 <?php
-/**
- * Admin View: Notice - Currency not supported.
- *
- * @package WooCommerce_Safe2Pay/Admin/Notices
- */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
