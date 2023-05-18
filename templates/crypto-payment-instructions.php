@@ -2,26 +2,20 @@
 	exit;
 } ?>
 
-<div class="woocommerce-message" style="display:block !important; color:#000 !important; background-color:#fff !important;">
-
+<div class="woocommerce-message"
+     style="display:block !important; color:#000 !important; background-color:#fff !important;">
     <span>
-        <?php echo __( 'Seu pedido foi recebido. Veja abaixo os dados para realizar o pagamento:', 'woo-safe2pay' ); ?>
-        <br/>
-        <div style="margin-left: auto;margin-right: auto;width: 10em;">
-			<img src="<?php echo esc_url( $link ); ?>" alt="QR CODE">
-			<br/>
-		</div>
+        <?php
+        $payment_message              = esc_html__( 'Seu pedido foi recebido. Veja abaixo os dados para realizar o pagamento:', 'woo-safe2pay' );
+        $qr_code_image                = '<div style="margin-left: auto;margin-right: auto;width: 10em;"><img src="' . esc_url( $link ) . '" alt="QR CODE"><br/></div>';
+        $amount_message               = esc_html__( 'Valor: ', 'woo-safe2pay' ) . esc_html( $amount );
+        $symbol_message               = esc_html__( 'Moeda: ', 'woo-safe2pay' ) . esc_html( $symbol );
+        $wallet_message               = esc_html__( 'Carteira: ', 'woo-safe2pay' ) . esc_html( $walletaddress );
+        $payment_confirmation_message = esc_html__( 'Após a confirmação do pagamento, seu pedido será liberado.', 'woo-safe2pay' );
 
-        <br/>
-            <?php echo __( 'Valor: ', 'woo-safe2pay' ); ?> <?php echo $amount; ?>
-        <br/>
-            <?php echo __( 'Moeda: ', 'woo-safe2pay' ); ?> <?php echo $symbol; ?>
-        <br/>
-            <?php echo __( 'Carteira: ', 'woo-safe2pay' ); ?> <?php echo $walletaddress; ?>
-        <br/>
-        <br/>
-            <?php echo __( 'Após a confirmação do pagamento, seu pedido será liberado.', 'woo-safe2pay' ); ?>
-        <br/>
+        $message = $payment_message . '<br/>' . $qr_code_image . '<br/>' . $amount_message . '<br/>' . $symbol_message . '<br/>' . $wallet_message . '<br/><br/>' . $payment_confirmation_message;
+
+        echo $message;
+        ?>
     </span>
-
 </div>

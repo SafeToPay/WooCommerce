@@ -60,10 +60,7 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway {
 		add_action('valid_safe2pay_ipn_request', array($this, 'update_order_status'));
 		add_action('woocommerce_update_options_payment_gateways_' . $this->id, array($this, 'process_admin_options'));
 		add_action('woocommerce_receipt_' . $this->id, array($this, 'receipt_page'));
-
-		// add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
-		add_action('woocommerce_order_details_after_order_table', array($this, 'thankyou_page'));
-
+     	add_action('woocommerce_thankyou_' . $this->id, array($this, 'thankyou_page'));
 		add_action('woocommerce_email_after_order_table', array($this, 'email_instructions'), 10, 3);
 		add_action('wp_enqueue_scripts', array($this, 'checkout_scripts'));
 	}
@@ -479,7 +476,7 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway {
 	public function process_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		$response = $this->api->PaymentController( $order, $_POST );
+		$response = $this->api->PaymentController( $order );
 
 		if ( $response['data'] ) {
 			$this->update_order_status( $response['data'], $order_id );
@@ -504,13 +501,8 @@ class WC_Safe2Pay_Gateway extends WC_Payment_Gateway {
 
 	public function receipt_page( $order_id ) {
 		$order        = wc_get_order( $order_id );
-		$request_data = $_POST;
 
-		if ( isset( $_GET['use_shipping'] ) && true === (bool) $_GET['use_shipping'] ) {
-			$request_data['ship_to_different_address'] = true;
-		}
-
-		$response = $this->api->CheckoutController( $order, $request_data );
+		$response = $this->api->CheckoutController( $order );
 
 		if ( $response['url'] ) {
 			wc_enqueue_js(

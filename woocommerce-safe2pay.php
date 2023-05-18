@@ -4,7 +4,7 @@
  * Plugin URI:           https://safe2pay.com.br/
  * Description:          Aceite pagamentos por boleto, cartões de crédito e Pix pelo Safe2Pay.
  * Author:               Safe2Pay
- * Version:              1.9
+ * Version:              1.9.2
  * License:              GPLv3 or later
  * Text Domain:          woo-safe2pay
  * Domain Path:          /languages
@@ -14,7 +14,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'WC_SAFE2PAY_VERSION', '1.9' );
+define( 'WC_SAFE2PAY_VERSION', '1.9.2' );
 define( 'WC_SAFE2PAY_PLUGIN_FILE', __FILE__ );
 
 if ( ! class_exists( 'WC_Safe2Pay' ) ) {

@@ -1,89 +1,68 @@
-<?php if (!defined('ABSPATH')) exit; ?>
+<?php if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+} ?>
 
-    <h2><?php _e('Payment', 'woo-safe2pay'); ?></h2>
+<h2><?php esc_html_e( 'Payment', 'woo-safe2pay' ); ?></h2>
 
-
-<?php if ($paymenttype == '1') : ?>
+<?php if ( $paymenttype == '1' ) : ?>
 
     <div class="order_details">
-    <span>
-		<a class="button" href="<?php echo esc_url($link); ?>" target="_blank">
-			<?php _e('Visualizar Boleto Bancário', 'woo-safe2pay'); ?>
-			<br/>
-		</a>
-
-		<?php _e('Clique no botão para visualizar o seu boleto bancário. 
-					Após a confirmação do pagamento, seu pedido será processado.', 'woo-safe2pay'); ?>
-	</span>
+		<?php
+		$message = '<a class="button" href="' . esc_url( $link ) . '" target="_blank">' . esc_html__( 'Visualizar Boleto Bancário', 'woo-safe2pay' ) . '<br/></a>';
+		$message .= esc_html__( 'Clique no botão para visualizar o seu boleto bancário. Após a confirmação do pagamento, seu pedido será processado.', 'woo-safe2pay' );
+		echo '<span>' . $message . '</span>';
+		?>
     </div>
 
-<?php elseif ($paymenttype == '2') : ?>
+<?php elseif ( $paymenttype == '2' ) : ?>
 
     <div class="order_details">
-		<span>
-			<?php _e('Pagamento autorizado', 'woo-safe2pay'); ?></a>
-			<?php _e('Tudo certo! Seu pedido será processado.', 'woo-safe2pay'); ?>
+        <span>
+            <?php esc_html_e( 'Pagamento autorizado', 'woo-safe2pay' ); ?>
+            <?php esc_html_e( 'Tudo certo! Seu pedido será processado.', 'woo-safe2pay' ); ?>
         </span>
     </div>
 
-<?php elseif ($paymenttype == '3') : ?>
+<?php elseif ( $paymenttype == '3' ) : ?>
 
     <div class="order_details">
         <div style="margin-left: auto;margin-right: auto;width: 10em;">
-            <img src="<?php echo esc_url($link); ?>" alt="QR CODE">
+            <img src="<?php echo esc_url( $link ); ?>" alt="QR CODE">
             <br/>
         </div>
 
         <div style="text-align: center; font-size: 12px;">
-            <span style="">Moeda: <?php echo $symbol; ?></span>
+            <span style=""><?php esc_html_e( 'Moeda: ', 'woo-safe2pay' ); ?><?php echo esc_html( $symbol ); ?></span>
             <br/>
-            <span style="">Valor: <?php echo $amount; ?></span>
+            <span style=""><?php esc_html_e( 'Valor: ', 'woo-safe2pay' ); ?><?php echo esc_html( $amount ); ?></span>
             <br/>
-            <span style="">Carteira: <?php echo $walletaddress; ?></span>
+            <span style=""><?php esc_html_e( 'Carteira: ', 'woo-safe2pay' ); ?><?php echo esc_html( $walletaddress ); ?></span>
             <br>
         </div>
 
         <br/>
 
         <div style="text-align: center;">
-            <?php _e('Após a confirmação do pagamento, Seu pedido será processado.', 'woo-safe2pay'); ?>
+			<?php esc_html_e( 'Após a confirmação do pagamento, Seu pedido será processado.', 'woo-safe2pay' ); ?>
         </div>
         <br/>
     </div>
 
-<?php elseif ($paymenttype == '4') : ?>
+<?php elseif ( $paymenttype == '6' ) : ?>
 
     <div class="order_details">
-
-		<span>
-			<a class="button" href="<?php echo esc_url($link); ?>" target="_blank">
-				<?php _e('Finalizar compra!', 'woo-safe2pay'); ?>
-				<br/>
-			</a>
-
-			<?php _e('Clique no botão para acessar o internet banking e finalizar a compra. 
-					Após a confirmação do pagamento, seu pedido será processado.', 'woo-safe2pay'); ?>
-		</span>
-
-    </div>
-
-<?php elseif ($paymenttype == '6') : ?>
-
-    <div class="order_details">
-
-        <span>
-            <?php echo __('Seu pedido foi recebido. Utilize os dados abaixo para efetuar o pagamento:', 'woo-safe2pay'); ?>
-            <div style="margin-left: auto;margin-right: auto;width: 10em;">
-                <img src="<?php echo esc_url( $link ); ?>" alt="QR CODE">
-                <br/>
-            </div>
-                <?php echo __('Copia e Cola: ', 'woo-safe2pay'); ?> <?php echo $key; ?>
-            <br/>
-            <br/>
-                <?php echo __('Após a confirmação do pagamento, seu pedido será liberado.', 'woo-safe2pay'); ?>
-            <br/>
-        </span>
-
+		<?php
+		$message = esc_html__( 'Seu pedido foi recebido. Utilize os dados abaixo para efetuar o pagamento:', 'woo-safe2pay' );
+		$message .= '<div style="margin-left: auto;margin-right: auto;width: 10em;">';
+		$message .= '<img src="' . esc_url( $link ) . '" alt="QR CODE">';
+		$message .= '<br/>';
+		$message .= '</div>';
+		$message .= esc_html__( 'Copia e Cola: ', 'woo-safe2pay' ) . ' ' . esc_html( $key );
+		$message .= '<br/>';
+		$message .= '<br/>';
+		$message .= esc_html__( 'Após a confirmação do pagamento, seu pedido será liberado.', 'woo-safe2pay' );
+		echo '<span>' . $message . '</span>';
+		?>
     </div>
 
 <?php endif; ?>

@@ -18,41 +18,49 @@ if ( ! empty( $tc_interest_rate ) ) {
 
     <ul id="safe2pay-payment-methods" style="margin-bottom: 5%;" class="payment-methods">
 
-		<?php if ( $tc_pix == 'yes' ) : ?>
-            <li><label>
-                    <input id="safe2pay-payment-method-pix" type="radio" name="safe2pay_payment_method" required
-                           value="pix" <?php checked( true, ( 'no' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_ticket ), true ); ?> />
-					<?php _e( 'Pix', 'woo-safe2pay' ); ?>
+        <div class="payment-method-section">
+			<?php if ( $tc_pix == 'yes' ) : ?>
+                <li><label>
+                        <input id="safe2pay-payment-method-pix" type="radio" name="safe2pay_payment_method" required
+                               value="pix" <?php checked( true, ( 'no' == $tc_cryptocurrency && 'no' == $tc_credit && 'no' == $tc_ticket ), true ); ?> />
+						<?php _e( 'Pix', 'woo-safe2pay' ); ?>
 
-                </label></li>
-		<?php endif; ?>
+                    </label></li>
+			<?php endif; ?>
+        </div>
 
-		<?php if ( $tc_ticket == 'yes' ) : ?>
-            <li><label>
-                    <input id="safe2pay-payment-method-bank-slip" type="radio" name="safe2pay_payment_method" required
-                           value="bank-slip" <?php checked( true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'no' == $tc_credit ), true ); ?> />
-					<?php _e( 'Boleto', 'woo-safe2pay' ); ?>
+        <div class="payment-method-section">
+			<?php if ( $tc_ticket == 'yes' ) : ?>
+                <li><label>
+                        <input id="safe2pay-payment-method-bank-slip" type="radio" name="safe2pay_payment_method" required
+                               value="bank-slip" <?php checked( true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'no' == $tc_credit ), true ); ?> />
+						<?php _e( 'Boleto', 'woo-safe2pay' ); ?>
 
-                </label></li>
-		<?php endif; ?>
+                    </label></li>
+			<?php endif; ?>
+        </div>
 
-		<?php if ( $tc_credit == 'yes' ) : ?>
-            <li><label>
-                    <input id="safe2pay-payment-method-credit-card" type="radio" name="safe2pay_payment_method" required
-                           value="credit-card" <?php checked( true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'yes' == $tc_ticket ), true ); ?> />
+        <div class="payment-method-section">
+			<?php if ( $tc_credit == 'yes' ) : ?>
+                <li><label>
+                        <input id="safe2pay-payment-method-credit-card" type="radio" name="safe2pay_payment_method" required
+                               value="credit-card" <?php checked( true, ( 'no' == $tc_pix && 'no' == $tc_cryptocurrency && 'yes' == $tc_ticket ), true ); ?> />
 
-					<?php _e( 'Cartão de Crédito', 'woo-safe2pay' ); ?>
-                </label></li>
-		<?php endif; ?>
+						<?php _e( 'Cartão de Crédito', 'woo-safe2pay' ); ?>
+                    </label></li>
+			<?php endif; ?>
+        </div>
 
-		<?php if ( $tc_cryptocurrency == 'yes' ) : ?>
-            <li><label>
-                    <input id="safe2pay-payment-method-crypto-currency" type="radio" name="safe2pay_payment_method"
-                           required
-                           value="crypto-currency" <?php checked( true, ( 'no' == $tc_pix && 'no' == $tc_credit && 'no' == $tc_ticket ), true ); ?> />
-					<?php _e( 'Criptomoedas', 'woo-safe2pay' ); ?>
-                </label></li>
-		<?php endif; ?>
+        <div class="payment-method-section">
+			<?php if ( $tc_cryptocurrency == 'yes' ) : ?>
+                <li><label>
+                        <input id="safe2pay-payment-method-crypto-currency" type="radio" name="safe2pay_payment_method"
+                               required
+                               value="crypto-currency" <?php checked( true, ( 'no' == $tc_pix && 'no' == $tc_credit && 'no' == $tc_ticket ), true ); ?> />
+						<?php _e( 'Criptomoedas', 'woo-safe2pay' ); ?>
+                    </label></li>
+			<?php endif; ?>
+        </div>
     </ul>
 
     <div class="clear"></div>
@@ -141,7 +149,7 @@ if ( ! empty( $tc_interest_rate ) ) {
 
 			<?php if ( $tc_installments > 1 ) : ?>
 
-                <p id="safe2pay-card-installments-field" class="form-row form-row-first">
+                <p id="safe2pay-card-installments-field" class="form-row form-row-wide">
                     <label for="safe2pay-card-installments"><?php _e( 'Parcelar em ', 'woo-safe2pay' ); ?><span
                                 class="required">*</span></label>
                     <select id="safe2pay-card-installments" name="safe2pay_card_installments"
@@ -223,12 +231,17 @@ if ( ! empty( $tc_interest_rate ) ) {
 	<?php endif; ?>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             var paymentForm = document.getElementById('safe2pay-payment-form');
             var paymentMethods = paymentForm.querySelectorAll('input[type="radio"]');
             var submitButton = paymentForm.querySelector('button[type="submit"]');
 
-            submitButton.addEventListener('click', function (e) {
+            // Auto select the first method if only one is available
+            if (paymentMethods.length == 1) {
+                paymentMethods[0].checked = true;
+            }
+
+            submitButton.addEventListener('click', function(e) {
                 var selectedMethod = false;
                 for (var i = 0; i < paymentMethods.length; i++) {
                     if (paymentMethods[i].checked) {
@@ -243,6 +256,7 @@ if ( ! empty( $tc_interest_rate ) ) {
                 }
             });
         });
+
     </script>
 
 </fieldset>

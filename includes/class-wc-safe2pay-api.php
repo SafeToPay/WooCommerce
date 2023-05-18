@@ -173,9 +173,10 @@ class WC_Safe2Pay_API
         return $splits;
     }
 
-    protected function get_payload($order, $posted, $IsSandbox)
+
+    protected function get_payload($order, $IsSandbox)
     {
-        $method = isset($posted['safe2pay_payment_method']) ? $this->GetPaymentMethod($posted['safe2pay_payment_method']) : '';
+        $method = sanitize_text_field(isset($_POST['safe2pay_payment_method'])) ? $this->GetPaymentMethod(sanitize_text_field($_POST['safe2pay_payment_method'])) : '';
         $woo = new WooCommerce();
 	    $PaymentObject = null;
 
@@ -199,19 +200,19 @@ class WC_Safe2Pay_API
                 $paymentMethod = "2";
 
 	            $PaymentObject = array(
-                    'Holder' => sanitize_text_field($posted['safe2pay-card-holder-name']),
-                    'CardNumber' => sanitize_text_field($posted['safe2pay-card-number']),
-                    'ExpirationDate' => sanitize_text_field($posted['safe2pay-card-expiry-field']),
-                    'SecurityCode' => sanitize_text_field($posted['safe2pay-card-cvc'])
+                    'Holder' => sanitize_text_field($_POST['safe2pay-card-holder-name']),
+                    'CardNumber' => sanitize_text_field($_POST['safe2pay-card-number']),
+                    'ExpirationDate' => sanitize_text_field($_POST['safe2pay-card-expiry-field']),
+                    'SecurityCode' => sanitize_text_field($_POST['safe2pay-card-cvc'])
                 );
 
-	            $installment = isset($posted['safe2pay_card_installments']) ? absint($posted['safe2pay_card_installments']) : 1;
+	            $installment = sanitize_text_field(isset($_POST['safe2pay_card_installments'])) ? sanitize_text_field(absint($_POST['safe2pay_card_installments'])) : 1;
 
-	            if (!empty($posted['safe2pay_card_installments'])) {
+	            if (!empty(sanitize_text_field($_POST['safe2pay_card_installments']))) {
 		            $PaymentObject['InstallmentQuantity'] = $installment;
 	            }
 
-	            $interest_rates = isset($posted['tc_interest_rate']) ? explode(';', $posted['tc_interest_rate']) : array_fill(0, $installment, 0);
+	            $interest_rates = sanitize_text_field(isset($_POST['tc_interest_rate'])) ? explode(';', sanitize_text_field($_POST['tc_interest_rate'])) : array_fill(0, $installment, 0);
 	            $interest_rate = isset($interest_rates[$installment - 1]) ? floatval($interest_rates[$installment - 1]) : 0;
 
 	            if ($interest_rate > 0) {
@@ -236,12 +237,12 @@ class WC_Safe2Pay_API
 
         $identity = null;
 
-        if (!empty($posted['billing_cpf'])) {
-            $identity = sanitize_text_field($posted['billing_cpf']);
-        } else if (!empty($posted['billing_cnpj'])) {
-            $identity = sanitize_text_field($posted['billing_cnpj']);
-        } else if (!empty($posted['customer_identity'])) {
-            $identity = sanitize_text_field($posted['customer_identity']);
+        if (!empty(sanitize_text_field($_POST['billing_cpf']))) {
+            $identity = sanitize_text_field($_POST['billing_cpf']);
+        } else if (!empty(sanitize_text_field($_POST['billing_cnpj']))) {
+            $identity = sanitize_text_field($_POST['billing_cnpj']);
+        } else if (!empty(sanitize_text_field($_POST['customer_identity']))) {
+            $identity = sanitize_text_field($_POST['customer_identity']);
         }
 
         $payload = [
@@ -253,18 +254,18 @@ class WC_Safe2Pay_API
             'IpAddress' => WC_Geolocation::get_ip_address(),
             'Products' => $Products,
             'Customer' => [
-                "Name" => sanitize_text_field($posted['billing_first_name'] . ' ' . $posted['billing_last_name']),
+                "Name" => sanitize_text_field($_POST['billing_first_name'] . ' ' . $_POST['billing_last_name']),
                 "Identity" => $identity,
-                "Phone" => sanitize_text_field($posted['billing_phone']),
-                "Email" => sanitize_text_field($posted['billing_email']),
+                "Phone" => sanitize_text_field($_POST['billing_phone']),
+                "Email" => sanitize_text_field($_POST['billing_email']),
                 "Address" => [
-                    "Street" => sanitize_text_field($posted['billing_address_1']),
-                    "Number" => sanitize_text_field(isset($posted['billing_number']) ? $posted['billing_number'] : 'S/N'),
-                    "District" => sanitize_text_field(isset($posted['billing_neighborhood']) ? $posted['billing_neighborhood'] : 'Não informado'),
-                    "ZipCode" => sanitize_text_field($posted['billing_postcode']),
-                    "CityName" => sanitize_text_field($posted['billing_city']),
-                    "StateInitials" => sanitize_text_field($posted['billing_state']),
-                    "CountryName" => sanitize_text_field(isset($posted['billing_country']) ? $posted['billing_country'] : 'Brasil')
+                    "Street" => sanitize_text_field($_POST['billing_address_1']),
+                    "Number" => sanitize_text_field(isset($_POST['billing_number']) ? $_POST['billing_number'] : 'S/N'),
+                    "District" => sanitize_text_field(isset($_POST['billing_neighborhood']) ? $_POST['billing_neighborhood'] : 'Não informado'),
+                    "ZipCode" => sanitize_text_field($_POST['billing_postcode']),
+                    "CityName" => sanitize_text_field($_POST['billing_city']),
+                    "StateInitials" => sanitize_text_field($_POST['billing_state']),
+                    "CountryName" => sanitize_text_field(isset($_POST['billing_country']) ? $_POST['billing_country'] : 'Brasil')
                 ]
             ],
             'CallbackUrl' => $this->get_callback_uri($order->get_id())
@@ -280,12 +281,12 @@ class WC_Safe2Pay_API
         return json_encode($payload);
     }
 
-    public function CheckoutController($order, $posted)
+    public function CheckoutController($order)
     {
         try {
             $IsSandbox = strtoupper($this->gateway->settings['sandbox']) !== "NO";
 
-            $payload = $this->get_payload($order, $posted, $IsSandbox);
+            $payload = $this->get_payload($order, $IsSandbox);
 
             if ('yes' == $this->gateway->debug) {
                 $this->gateway->log->add($this->gateway->id, 'Requesting token for order ' . $order->get_order_number());
@@ -330,13 +331,13 @@ class WC_Safe2Pay_API
         }
     }
 
-    public function PaymentController($order, $posted)
+    public function PaymentController($order)
     {
-        $payment_method = isset($posted['safe2pay_payment_method']) ? $posted['safe2pay_payment_method'] : '';
+        $payment_method =  sanitize_text_field($_POST['safe2pay_payment_method']) ;
 
         $IsSandbox = strtoupper($this->gateway->settings['sandbox']) !== "NO";
 
-        $payload = $this->get_payload($order, $posted, $IsSandbox);
+        $payload = $this->get_payload($order, $IsSandbox);
 
         if ('yes' == $this->gateway->debug) {
             $this->gateway->log->add($this->gateway->id, 'Requesting direct payment for order ' . $order->get_order_number());

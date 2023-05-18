@@ -1,19 +1,16 @@
-<?php
-/**
- * Receipt page error template
- *
- * @package WooCommerce_Safe2Pay/Templates
- */
 if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+exit;
 }
 
 ?>
 
 <ul class="woocommerce-error">
 	<?php foreach ( $response['error'] as $message ) : ?>
-		<li><?php echo $message; ?></li>
+		<?php $sanitized_message = sanitize_text_field( $message ); ?>
+		<li><?php echo esc_html( $sanitized_message ); ?></li>
 	<?php endforeach; ?>
 </ul>
 
-<a class="button cancel" href="<?php echo esc_url( $order->get_cancel_order_url() ); ?>"><?php esc_html_e( 'Click to try again', 'woo-safe2pay' ); ?></a>
+<?php $cancel_order_url = esc_url( $order->get_cancel_order_url() ); ?>
+<a class="button cancel"
+   href="<?php echo esc_html__($cancel_order_url); ?>"><?php esc_html_e( 'Click to try again', 'woo-safe2pay' ); ?></a>
