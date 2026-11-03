@@ -43,16 +43,15 @@ class WC_Safe2Pay
 
                         $secretkey = $callback['SecretKey'];
 
-                        if ($secretkey == null) {
+                        if (!is_string($secretkey) || $secretkey === '') {
                             return new WP_Error('The request has not been applied because it lacks valid authentication credentials for the target resource.', '', array('status' => 401));
                         }
 
                         $gateway = new WC_Safe2Pay_Gateway();
+                        $expectedKey = $gateway->sandbox === 'yes' ? $gateway->sandbox_secretkey : $gateway->secretkey;
 
-                        if ($secretkey == $gateway->secretkey || $secretkey == $gateway->sandbox_secretkey) {
-
+                        if (is_string($expectedKey) && $expectedKey === $secretkey) {
                             return true;
-
                         } else {
                             return new WP_Error('The request has not been applied because it lacks valid authentication credentials for the target resource.', '', array('status' => 401));
                         }
