@@ -4,7 +4,7 @@ Donate link: https://safe2pay.com.br/
 Tags: woocommerce, pagamento, boleto, cartão de crédito, bitcoin
 Requires at least: 5.6
 Tested up to: 6.1.1
-Stable tag: 1.0
+Stable tag: 1.9.3
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -53,3 +53,11 @@ Os clientes não necessitam sair da loja para finalizar a compra, ignorando form
 - É necessário ter uma conta de perfil Marketplace e habilitar a compatibilidade nas configurações do plugin do Safe2Pay.
 - Plugin [Brazilian Market on WooCommerce](https://br.wordpress.org/plugins/woocommerce-extra-checkout-fields-for-brazil/).
 - O split utilizará os números de documento informados para os vendedores na
+
+== Changelog ==
+
+= 1.9.3 =
+* Segurança: correção na validação da chave recebida no callback de notificação de status. Atualização recomendada para todas as lojas.
+
+= 1.9.2 =
+* Correções diversas.
